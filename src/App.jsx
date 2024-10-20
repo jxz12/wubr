@@ -2,13 +2,7 @@ import { useState } from 'react';
 import './App.css'
 import hanzis from './hanzis.json'
 
-const char2wubi = {};
-const wubi2char = {};
-for (let mapping of hanzis) {
-  char2wubi[mapping.character] = mapping.wubiCode;
-  wubi2char[mapping.wubiCode] = mapping.character;
-}
-
+letter,section,representativeRoot,roots
 function App() {
   let [wubi, setWubi] = useState("");
   console.log(wubi);
