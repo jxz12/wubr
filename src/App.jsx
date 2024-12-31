@@ -1,15 +1,38 @@
 import { useState } from 'react';
 import './App.css'
-import hanzis from './hanzis.json'
+import wubi from '../public/wubi.json'
 
-letter,section,representativeRoot,roots
+const wubi2chars = wubi.reduce(
+  (acc, item) => {
+    if (item["wubi"] in acc) {
+      acc[item["wubi"]].push(item["character"]);
+    } else {
+      acc[item["wubi"]] = [item["character"]];
+    }
+    return acc;
+  },
+  {},
+);
+
+function randWubi() {
+  const keys = Object.keys(wubi2chars);
+  return wubi2chars[keys[Math.floor(keys.length * Math.random())]];
+}
+
+// letter,section,representativeRoot,roots
 function App() {
   let [wubi, setWubi] = useState("");
-  console.log(wubi);
+  let [rand, setRand] = useState(randWubi());
   return (
     <>
-      <input onChange={e => setWubi(e.target.value)}/>
-      <h1>{wubi2char[wubi]}</h1>
+      <div>
+        <h1>{rand}</h1>
+        <button onClick={() => setRand(randWubi())}>randomize</button>
+      </div>
+      <div>
+        <input onChange={e => setWubi(e.target.value)}/>
+        <h1>{wubi2chars[wubi]}</h1>
+      </div>
     </>
   )
 }
