@@ -16,23 +16,27 @@ const wubi2chars = wubi.reduce(
 
 function randWubi() {
   const keys = Object.keys(wubi2chars);
-  return wubi2chars[keys[Math.floor(keys.length * Math.random())]];
+  return keys[Math.floor(keys.length * Math.random())];
 }
 
 // letter,section,representativeRoot,roots
 function App() {
-  let [wubi, setWubi] = useState("");
+  let [user, setUser] = useState("");
   let [rand, setRand] = useState(randWubi());
   return (
     <>
-      <div>
-        <h1>{rand}</h1>
-        <button onClick={() => setRand(randWubi())}>randomize</button>
-      </div>
-      <div>
-        <input onChange={e => setWubi(e.target.value)}/>
-        <h1>{wubi2chars[wubi]}</h1>
-      </div>
+      <h1>{wubi2chars[rand]}</h1>
+      <input value={user} onChange={(e) => {
+        const newVal = e.target.value;
+        if (newVal.slice(-1) == " ") {
+          setUser("");
+          setRand(randWubi());
+        } else {
+          setUser(newVal);
+        }
+      }
+      } />
+      <h1 style={user == rand ? {color: "Chartreuse"} : {}}>{wubi2chars[user]}</h1>
     </>
   )
 }
