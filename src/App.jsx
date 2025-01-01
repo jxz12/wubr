@@ -1,42 +1,56 @@
 import { useState } from 'react';
 import './App.css'
-import wubi from '../public/wubi.json'
+import characters from '../public/characters.json'
 
-const wubi2chars = wubi.reduce(
+const chars = characters.reduce(
   (acc, item) => {
-    if (item["wubi"] in acc) {
-      acc[item["wubi"]].push(item["character"]);
-    } else {
-      acc[item["wubi"]] = [item["character"]];
-    }
+    acc[item["character"]] = {
+      wubi: item["wubi"].split(" "),
+      pinyin: item["pinyin"].split(" ")
+    };
     return acc;
   },
   {},
 );
+const wubis = characters.reduce(
+  (acc, item) => {
+    for (const wubi of item["wubi"].split(" ")) {
+      acc[wubi] = item["character"];
+    }
+    return acc;
+  },
+  {},
+)
 
-function randWubi() {
-  const keys = Object.keys(wubi2chars);
+function randChar() {
+  const keys = Object.keys(chars);
   return keys[Math.floor(keys.length * Math.random())];
 }
 
-// letter,section,representativeRoot,roots
 function App() {
-  let [user, setUser] = useState("");
-  let [rand, setRand] = useState(randWubi());
+  const [user, setUser] = useState("");
+  const [rand, setRand] = useState(randChar());
+  // const [rand, setRand] = useState("一");
+  const [correct, setCorrect] = useState([]);
   return (
     <>
-      <h1>{wubi2chars[rand]}</h1>
-      <input value={user} onChange={(e) => {
+      <h2>{chars[rand].pinyin[0]}</h2>
+      <h1>{rand}</h1>
+      <input value={user} onChange={e => {
         const newVal = e.target.value;
         if (newVal.slice(-1) == " ") {
+          if (wubis[user] == rand) {
+            setCorrect(prev => prev.concat([rand]))
+          }
           setUser("");
-          setRand(randWubi());
+          setRand(randChar());
         } else {
           setUser(newVal);
         }
       }
       } />
-      <h1 style={user == rand ? {color: "Chartreuse"} : {}}>{wubi2chars[user]}</h1>
+      <h1 style={wubis[user] == rand ? {color: "Chartreuse"} : {}}>{wubis[user]}</h1>
+      <h2 style={{color: "Chartreuse"}}>{correct}</h2>
     </>
   )
 }

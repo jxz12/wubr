@@ -10,10 +10,6 @@
 * to render the wubi roots I need to vectorise the wubi86 keyboard with AI
   * and then I can manually extract the components with inkscape (tbh I could probably just trace them in inkscape)
   * and then I can render the SVG on command (unfortunately )
-Blue characters: key character roots
-Red characters: stroke-based character roots
-Green characters: roots used for compound characters
-Numbers at bottom: position and key information
 
 蓝字根：键名字
 Blue characters: Key name characters
@@ -25,6 +21,9 @@ Green characters: Used for traditional characters
 Bottom blue characters: Area position, keystrokes
 下方绿字：一级备码字
 Bottom green characters: First-level alternative code characters
+
+I understand [Isolation](https://madmansnest.com/2018/05/09/wubi-part-6.html) but I don't understand how to type roots that are directly on the key
+How is 文 yygy
 
 
 # Piano app
