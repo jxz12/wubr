@@ -51,6 +51,9 @@ function App() {
       } />
       <h1 style={wubis[user] == rand ? {color: "Chartreuse"} : {}}>{wubis[user]}</h1>
       <h2 style={{color: "Chartreuse"}}>{correct}</h2>
+      <h3>金 人 月 白 禾 言 立 水 火 之</h3>
+      <h3>工 木 大 土 王 目 日 口 田</h3>
+      <h3>纟 又 女 子 已 山</h3>
     </>
   )
 }
