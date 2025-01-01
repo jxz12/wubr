@@ -15,12 +15,16 @@ const chars = characters.reduce(
 const wubis = characters.reduce(
   (acc, item) => {
     for (const wubi of item["wubi"].split(" ")) {
-      acc[wubi] = item["character"];
+      if (wubi in acc) {
+        acc[wubi].push(item["character"]);
+      } else {
+        acc[wubi] = [item["character"]];
+      }
     }
     return acc;
   },
   {},
-)
+);
 
 function randChar() {
   const keys = Object.keys(chars);
@@ -32,6 +36,7 @@ function App() {
   const [rand, setRand] = useState(randChar());
   // const [rand, setRand] = useState("一");
   const [correct, setCorrect] = useState([]);
+  const [incorrect, setIncorrect] = useState([]);
   return (
     <>
       <h2>{chars[rand].pinyin[0]}</h2>
@@ -39,8 +44,10 @@ function App() {
       <input value={user} onChange={e => {
         const newVal = e.target.value;
         if (newVal.slice(-1) == " ") {
-          if (wubis[user] == rand) {
-            setCorrect(prev => prev.concat([rand]))
+          if ((wubis[user] ?? []).includes(rand)) {
+            setCorrect(prev => prev.concat([rand]));
+          } else {
+            setIncorrect(prev => prev.concat([rand, chars[rand].wubi[0]]))
           }
           setUser("");
           setRand(randChar());
@@ -49,8 +56,9 @@ function App() {
         }
       }
       } />
-      <h1 style={wubis[user] == rand ? {color: "Chartreuse"} : {}}>{wubis[user]}</h1>
+      <h1 style={(wubis[user] ?? []).includes(rand) ? {color: "Chartreuse"} : {}}>{wubis[user]}</h1>
       <h2 style={{color: "Chartreuse"}}>{correct}</h2>
+      <h2 style={{color: "red"}}>{incorrect}</h2>
       <h3>金 人 月 白 禾 言 立 水 火 之</h3>
       <h3>工 木 大 土 王 目 日 口 田</h3>
       <h3>纟 又 女 子 已 山</h3>
