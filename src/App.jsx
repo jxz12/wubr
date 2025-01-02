@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import './App.css'
-import characters from '../public/characters.json'
+import characters from '../public/zi.json'
 
 const chars = characters.reduce(
   (acc, item) => {
-    acc[item["character"]] = {
+    acc[item["hanzi"]] = {
       wubi: item["wubi"].split(" "),
-      pinyin: item["pinyin"].split(" ")
+      // pinyin: item["pinyin"].split(" ")
+      cangjie: item["cangjie"].split(" ")
     };
     return acc;
   },
@@ -37,9 +38,9 @@ function App() {
   // const [rand, setRand] = useState("一");
   const [correct, setCorrect] = useState([]);
   const [incorrect, setIncorrect] = useState([]);
+      // <h2>{chars[rand].pinyin[0]}</h2>
   return (
     <>
-      <h2>{chars[rand].pinyin[0]}</h2>
       <h1>{rand}</h1>
       <input value={user} onChange={e => {
         const newVal = e.target.value;
