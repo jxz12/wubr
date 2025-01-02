@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './App.css'
-import characters from '../public/zi.json'
+import zi from '../public/zi.json'
+// import ci from '../public/ci.json'
 
 const chars = characters.reduce(
   (acc, item) => {
