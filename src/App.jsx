@@ -1,43 +1,44 @@
 import { useState } from 'react';
 import './App.css'
-import zi from '../public/zi.json'
-import ci from '../public/ci.json'
+import zi from './data/zi.json'
+import ci from './data/ci.json'
+import hsk from './data/hsk.json'
 
-const chars = zi.reduce(
-  (acc, item) => {
-    acc[item["hanzi"]] = {
-      wubi: item["wubi"].split(" "),
-      cangjie: item["cangjie"].split(" ")
-    };
-    return acc;
-  },
-  {},
-);
-// const wubis = characters.reduce(
-//   (acc, item) => {
-//     for (const wubi of item["wubi"].split(" ")) {
-//       if (wubi in acc) {
-//         acc[wubi].push(item["character"]);
-//       } else {
-//         acc[wubi] = [item["character"]];
-//       }
-//     }
-//     return acc;
-//   },
-//   {},
-// );
+function* iterrows(table) {
+  const keys = Object.keys(table);
+  for (let i=0; i<table[keys[0]].length; i++) {
+    yield keys.reduce((acc, key) => {
+      acc[key] = table[key][i];
+      return acc;
+    }, {});
+  }
+}
 
-function randomCi() {
-  return ci[Math.floor(ci.length * Math.random())];
+const chars = iterrows(zi).reduce((acc, row) => {
+  acc[row["hanzi"]] = {
+    wubi: row["wubi"]?.split(" "),
+    cangjie: row["cangjie"]?.split(" ")
+  };
+  return acc;
+}, {});
+
+const words = Array.from(iterrows(ci).map(row => row))
+
+const levels = iterrows(hsk).reduce((acc, row) => {
+  if (!(row["level"] in acc)) {
+    acc[row["level"]] = [];
+  }
+  acc[row["level"]].push(row["simplified"]);
+  return acc;
+}, {});
+
+function randomWord() {
+  return words[Math.floor(words.length * Math.random())];
 }
 
 function App() {
   const [user, setUser] = useState("");
-  const [rand, setRand] = useState(randomCi());
-  // const [rand, setRand] = useState("一");
-  const [correct, setCorrect] = useState([]);
-  const [incorrect, setIncorrect] = useState([]);
-      // <h1 style={(wubis[user] ?? []).includes(rand) ? {color: "Chartreuse"} : {}}>{wubis[user]}</h1>
+  const [rand, setRand] = useState(randomWord());
   return (
     <>
       <h2>{rand.pinyin}</h2>
@@ -54,21 +55,11 @@ function App() {
           //   setIncorrect(prev => prev.concat([rand, chars[rand].wubi[0]]))
           // }
           setUser("");
-          setRand(randomCi());
+          setRand(randomWord());
         } else {
           setUser(newVal);
         }
-      }
-      } />
-      <h2 style={{color: "Chartreuse"}}>{correct}</h2>
-      <h2 style={{color: "red"}}>{incorrect}</h2>
-      <h3>手 田 水 口 廿 卜 山 戈 人 心</h3>
-      <h3>日 尸 木 火 土 竹 十 大 中</h3>
-      <h3>重 難 金 女 月 弓 一</h3>
-      <br/>
-      <h3>金 人 月 白 禾 言 立 水 火 之</h3>
-      <h3>工 木 大 土 王 目 日 口 田</h3>
-      <h3>纟 又 女 子 已 山</h3>
+      }} />
     </>
   )
 }
