@@ -28,6 +28,7 @@ const levels = iterrows(hsk).reduce((acc, row) => {
   if (!(row["level"] in acc)) {
     acc[row["level"]] = [];
   }
+  // TODO: push the words instead
   acc[row["level"]].push(row["simplified"]);
   return acc;
 }, {});
