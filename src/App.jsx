@@ -1,24 +1,18 @@
 import './App.css'
 
-import {init} from "./state";
+import {init} from "./state/hub";
 import NavBar from './components/NavBar';
+import Quiz from './components/Quiz'
 
 
 export default function App() {
   // TODO: pronounce words as you type
-  const {hskLevel, characterSet, inputMethod} = init();
+  const {hskLevel, characterSet, inputMethod, quiz} = init();
   return (
     <>
-      <header>
-        <NavBar hskLevel={hskLevel} characterSet={characterSet} inputMethod={inputMethod} />
-      </header>
-      <body>
-        <Text problem={["foo", "bar"]}/>
-        <Keyboard inputMethod={inputMethod}/>
-      </body>
-      <footer>
-        <Footer/>
-      </footer>
+      <NavBar hskLevel={hskLevel} characterSet={characterSet} inputMethod={inputMethod} />
+      <Quiz words={quiz}/>
+      {/* <Keyboard inputMethod={inputMethod}/> */}
     </>
   )
 }
