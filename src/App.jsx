@@ -1,6 +1,6 @@
 import './App.css'
 
-import {init} from "./controller/hub";
+import {init} from "./model/model";
 import NavBar from './view/NavBar';
 import Quiz from './view/Quiz'
 

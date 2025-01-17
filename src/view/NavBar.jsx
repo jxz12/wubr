@@ -1,4 +1,4 @@
-import { pushClick } from "../controller/hub";
+import { pushClick } from "../controller/controller";
 
 export default function NavBar({hskLevel, characterSet, inputMethod}) {
   return (
@@ -8,7 +8,7 @@ export default function NavBar({hskLevel, characterSet, inputMethod}) {
         <select name="hskLevel" value={hskLevel} onChange={pushClick}>
           {[1,2,3,4,5,6].map(x => (<option key={x} value={x}>HSK Level {x}</option>))}
         </select>
-        <select name="inputMethod" value={characterSet} onChange={pushClick}>
+        <select name="characterSet" value={characterSet} onChange={pushClick}>
           <option value="simplified">Simplified (简体)</option>
           <option value="traditional">Traditional (繁体)</option>
         </select>
