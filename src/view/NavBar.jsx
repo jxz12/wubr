@@ -1,4 +1,4 @@
-import { pushClick } from "../state/hub";
+import { pushClick } from "../controller/hub";
 
 export default function NavBar({hskLevel, characterSet, inputMethod}) {
   return (

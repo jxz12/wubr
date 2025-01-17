@@ -1,8 +1,8 @@
 import './App.css'
 
-import {init} from "./state/hub";
-import NavBar from './components/NavBar';
-import Quiz from './components/Quiz'
+import {init} from "./controller/hub";
+import NavBar from './view/NavBar';
+import Quiz from './view/Quiz'
 
 
 export default function App() {
