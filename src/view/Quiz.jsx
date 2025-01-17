@@ -1,5 +1,4 @@
 
-export default function Quiz({words}) {
-  console.log(words);
-  return <p>hello</p>;
+export default function Quiz({words, characterSet}) {
+  return <p>{words}</p>;
 }

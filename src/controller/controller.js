@@ -1,17 +1,26 @@
-import {click, answer} from '../model/model'
+import {
+  setHskLevel,
+  setCharacterSet,
+  setInputMethod,
+  pushKeystroke
+} from '../model/model'
 
-document.addEventListener('keydown', pushKeystroke, true);
 
-const clicks = [];
-export function pushClick(event) {
-  clicks.push(event);
-  click(event.target.name, event.target.value);
+// NOTE to self: the controller needs to be stateless
+//   this will therefore be quite a thin layer just to convert between HTML events and our model
+
+export function select(event) {
+  switch (event.target.name) {
+    case "hskLevel":
+      setHskLevel(event.target.value);
+    case "characterSet":
+      setCharacterSet(event.target.value);
+    case "inputMethod":
+      setInputMethod(event.target.value);
+  }
 }
 
-const keystrokes = [];
-function pushKeystroke(event) {
-  console.log(event.code);
-  console.log(event.timeStamp);
-  keystrokes.push(event);
-  answer(keystrokes.map(e => e.code));
+document.addEventListener('keydown', onKeyDown, true);
+function onKeyDown(event) {
+  pushKeystroke(event.timeStamp, event.code);
 }

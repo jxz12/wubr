@@ -10,8 +10,9 @@ const state = {
   hskLevel: 1,
   characterSet: "simplified",
   inputMethod: "pinyin",
-  quiz: [],
-  answer: [],
+
+  // these will store a time series of all user inputs to derive the state
+  keystrokes: [],
 };
 
 const set = {};
@@ -20,8 +21,8 @@ export function init() {
   const [hskLevel, setHskLevel] = useState(state.hskLevel);
   const [characterSet, setCharacterSet] = useState(state.characterSet);
   const [inputMethod, setInputMethod] = useState(state.inputMethod);
-  const [quiz, setQuiz] = useState(state.quiz);
-  const [answer, setAnswer] = useState(state.answer);
+  const [quiz, setQuiz] = useState([]);
+  const [answer, setAnswer] = useState([]);
   useEffect(() => {
     set.hskLevel = setHskLevel;
     set.characterSet = setCharacterSet;
@@ -33,13 +34,24 @@ export function init() {
   return {hskLevel, characterSet, inputMethod, quiz, answer};
 }
 
-export function click(name, value) {
-  state[name] = value;
-  set[name](state[name]);
+export function setHskLevel(level) {
+  state.hskLevel = level;
+  set.hskLevel(level);
+  // TODO: need to reset entire quiz, questions and answers
 }
-export function answer(codes) {
-  state.answer = codes;
-  set.answer(state.answer);
+export function setCharacterSet(characterSet) {
+  state.characterSet = characterSet;
+  set.characterSet(characterSet);
+}
+export function setInputMethod(inputMethod) {
+  state.inputMethod = inputMethod;
+  set.inputMethod(inputMethod);
+  // TODO: reset the answer
+}
+export function pushKeystroke(timestamp, keycode) {
+  console.log(timestamp, keycode);
+  state.keystrokes.push([timestamp, keycode]);
+  // TODO: calculate if answer matches input
 }
 
 function newQuiz() {

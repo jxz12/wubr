@@ -11,7 +11,7 @@ export default function App() {
   return (
     <>
       <NavBar hskLevel={hskLevel} characterSet={characterSet} inputMethod={inputMethod} />
-      <Quiz words={quiz}/>
+      <Quiz words={quiz} characterSet={characterSet}/>
       {/* <Keyboard inputMethod={inputMethod}/> */}
     </>
   )
