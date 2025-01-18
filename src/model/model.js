@@ -5,7 +5,7 @@ import ci from '../data/ci.json'
 import hsk from '../data/hsk.json'
 
 
-// react state representing the model
+// react state to be stored in here
 let $ = undefined;
 
 // these will store a time series of all user inputs to derive the state
@@ -15,26 +15,26 @@ export function init() {
   const [hskLevel, setHskLevel] = useState(1);
   const [characterSet, setCharacterSet] = useState("simplified");
   const [inputMethod, setInputMethod] = useState("pinyin");
-  const [quiz, setQuiz] = useState([]);
+  const [question, setQuestion] = useState([]);
   const [answer, setAnswer] = useState([]);
   useEffect(() => {
     // this is a lot of boilerplate but allows us to keep track of state automatically
     $ = {
-      hskLevel, characterSet, inputMethod, quiz, answer,
+      hskLevel, characterSet, inputMethod, question, answer,
       setHskLevel: x => { $.hskLevel = x; setHskLevel(x); },
       setCharacterSet: x => { $.characterSet = x; setCharacterSet(x); },
       setInputMethod: x => { $.inputMethod = x; setInputMethod(x); },
-      setQuiz: x => { $.quiz = x; setQuiz(x); },
+      setQuestion: x => { $.question = x; setQuestion(x); },
       setAnswer: x => { $.answer = x; setAnswer(x); },
     }
-    newQuiz();
+    newQuestion();
   }, []);
-  return {hskLevel, characterSet, inputMethod, quiz, answer};
+  return {hskLevel, characterSet, inputMethod, question, answer};
 }
 
 export function setHskLevel(level) {
   $.setHskLevel(level);
-  // TODO: need to reset entire quiz, questions and answers
+  // TODO: need to reset entire question, questions and answers
 }
 export function setCharacterSet(characterSet) {
   $.setCharacterSet(characterSet);
@@ -43,14 +43,14 @@ export function setInputMethod(inputMethod) {
   $.setInputMethod(inputMethod);
   // TODO: reset the answer
 }
+
 export function pushKeystroke(timestamp, keycode) {
-  console.log(timestamp, keycode);
   keystrokes.push([timestamp, keycode]);
   // TODO: calculate if answer matches input
 }
 
-function newQuiz() {
-  $.setQuiz(randomWords($.hskLevel));
+function newQuestion() {
+  $.setQuestion(randomWords($.hskLevel));
 }
 
 function* iterrows(table) {
