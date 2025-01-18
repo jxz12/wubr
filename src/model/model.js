@@ -5,57 +5,52 @@ import ci from '../data/ci.json'
 import hsk from '../data/hsk.json'
 
 
-// global state representing the model
-const state = {
-  hskLevel: 1,
-  characterSet: "simplified",
-  inputMethod: "pinyin",
+// react state representing the model
+let $ = undefined;
 
-  // these will store a time series of all user inputs to derive the state
-  keystrokes: [],
-};
-
-const set = {};
+// these will store a time series of all user inputs to derive the state
+const keystrokes = [];
 
 export function init() {
-  const [hskLevel, setHskLevel] = useState(state.hskLevel);
-  const [characterSet, setCharacterSet] = useState(state.characterSet);
-  const [inputMethod, setInputMethod] = useState(state.inputMethod);
+  const [hskLevel, setHskLevel] = useState(1);
+  const [characterSet, setCharacterSet] = useState("simplified");
+  const [inputMethod, setInputMethod] = useState("pinyin");
   const [quiz, setQuiz] = useState([]);
   const [answer, setAnswer] = useState([]);
   useEffect(() => {
-    set.hskLevel = setHskLevel;
-    set.characterSet = setCharacterSet;
-    set.inputMethod = setInputMethod;
-    set.quiz = setQuiz;
-    set.answer = setAnswer;
+    // this is a lot of boilerplate but allows us to keep track of state automatically
+    $ = {
+      hskLevel, characterSet, inputMethod, quiz, answer,
+      setHskLevel: x => { $.hskLevel = x; setHskLevel(x); },
+      setCharacterSet: x => { $.characterSet = x; setCharacterSet(x); },
+      setInputMethod: x => { $.inputMethod = x; setInputMethod(x); },
+      setQuiz: x => { $.quiz = x; setQuiz(x); },
+      setAnswer: x => { $.answer = x; setAnswer(x); },
+    }
     newQuiz();
   }, []);
   return {hskLevel, characterSet, inputMethod, quiz, answer};
 }
 
 export function setHskLevel(level) {
-  state.hskLevel = level;
-  set.hskLevel(level);
+  $.setHskLevel(level);
   // TODO: need to reset entire quiz, questions and answers
 }
 export function setCharacterSet(characterSet) {
-  state.characterSet = characterSet;
-  set.characterSet(characterSet);
+  $.setCharacterSet(characterSet);
 }
 export function setInputMethod(inputMethod) {
-  state.inputMethod = inputMethod;
-  set.inputMethod(inputMethod);
+  $.setInputMethod(inputMethod);
   // TODO: reset the answer
 }
 export function pushKeystroke(timestamp, keycode) {
   console.log(timestamp, keycode);
-  state.keystrokes.push([timestamp, keycode]);
+  keystrokes.push([timestamp, keycode]);
   // TODO: calculate if answer matches input
 }
 
 function newQuiz() {
-  set.quiz(randomWords(state.hskLevel));
+  $.setQuiz(randomWords($.hskLevel));
 }
 
 function* iterrows(table) {
