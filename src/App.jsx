@@ -3,7 +3,7 @@ import './App.css'
 import {init} from "./model/model";
 import NavBar from './view/NavBar';
 import Question from './view/Question'
-import Answer from './view/Answer'
+import Keyboard from './view/Keyboard'
 
 
 export default function App() {
@@ -12,9 +12,8 @@ export default function App() {
   return (
     <>
       <NavBar hskLevel={hskLevel} characterSet={characterSet} inputMethod={inputMethod} />
-      <Question words={question} characterSet={characterSet}/>
-      <Answer words={answer}/>
-      {/* <Keyboard inputMethod={inputMethod}/> */}
+      <Question question={question} answer={answer} characterSet={characterSet} inputMethod={inputMethod}/>
+      <Keyboard inputMethod={inputMethod} answer={answer}/>
     </>
   )
 }

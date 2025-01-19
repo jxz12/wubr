@@ -82,6 +82,9 @@ const levels = iterrows(hsk).reduce((acc, row) => {
 }, {});
 
 export function randomWords(level, numWords=10) {
-  // TODO: eventually this should be customised based on the user's learning progress, like keybr
-  return words[Math.floor(words.length * Math.random())];
+  return Array(numWords).fill(undefined).map(_ => {
+    const options = levels[level];
+    const simplified = options[Math.floor(options.length * Math.random())];
+    return words[simplified];
+  });
 }
