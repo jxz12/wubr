@@ -1,12 +1,12 @@
 import { select } from "../controller/controller";
 
-export default function NavBar({hskLevel, characterSet, inputMethod}) {
+export default function NavBar({ hskLevel, characterSet, inputMethod }) {
   return (
     <>
-			<h1>wubr</h1>
+      <h1>wubr</h1>
       <div>
         <select name="hskLevel" value={hskLevel} onChange={select}>
-          {[1,2,3,4,5,6].map(x => (<option key={x} value={x}>HSK Level {x}</option>))}
+          {[1, 2, 3, 4, 5, 6].map(x => (<option key={x} value={x}>HSK Level {x}</option>))}
         </select>
         <select name="characterSet" value={characterSet} onChange={select}>
           <option value="simplified">Simplified (简体)</option>
@@ -20,5 +20,5 @@ export default function NavBar({hskLevel, characterSet, inputMethod}) {
         </select>
       </div>
     </>
-	)
+  )
 }
