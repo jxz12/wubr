@@ -1,8 +1,8 @@
 import {useState, useEffect} from 'react'
 
-import zi from '../data/zi.json'
-import ci from '../data/ci.json'
-import hsk from '../data/hsk.json'
+import ziData from '../data/zi.json'
+import ciData from '../data/ci.json'
+import hskData from '../data/hsk.json'
 
 
 // react state to be stored in here
@@ -10,6 +10,7 @@ let $ = undefined;
 
 // these will store a time series of all user inputs to derive the state
 const keystrokes = [];
+const ciQuestion = [];
 
 export function init() {
   const [hskLevel, setHskLevel] = useState(1);
@@ -27,21 +28,25 @@ export function init() {
       setQuestion: x => { $.question = x; setQuestion(x); },
       setAnswer: x => { $.answer = x; setAnswer(x); },
     }
-    newQuestion();
+    randomiseCi();
   }, []);
   return {hskLevel, characterSet, inputMethod, question, answer};
 }
 
 export function setHskLevel(level) {
   $.setHskLevel(level);
-  // TODO: need to reset entire question, questions and answers
+  randomiseCi();
+  // TODO: need to reset answer
 }
 export function setCharacterSet(characterSet) {
   $.setCharacterSet(characterSet);
+  deriveQuestionFromCi();
+  // TODO: need to reset answer only if input method is wubi or cangjie
 }
 export function setInputMethod(inputMethod) {
   $.setInputMethod(inputMethod);
-  // TODO: reset the answer
+  deriveQuestionFromCi();
+  // TODO: need to reset answer
 }
 
 export function pushKeystroke(timestamp, keycode) {
@@ -49,8 +54,37 @@ export function pushKeystroke(timestamp, keycode) {
   // TODO: calculate if answer matches input
 }
 
-function newQuestion() {
-  $.setQuestion(randomWords($.hskLevel));
+function randomiseCi(numWords=10) {
+  const randomised = Array(numWords).fill(undefined).map(_ => {
+    const options = hsk[$.hskLevel];
+    return options[Math.floor(options.length * Math.random())];
+  });
+  ciQuestion.push(randomised);
+  deriveQuestionFromCi();
+}
+function deriveQuestionFromCi() {
+  $.setQuestion(
+    ciQuestion[ciQuestion.length - 1].map(simplified => {
+      const result = { simplified };
+      result.definitions = ci[simplified];
+
+      if (["wubi", "cangjie"].includes($.inputMethod)) {
+        // TODO: handle when characterSet is traditional?
+        result.spelling = simplified.map(
+          x => x.split("").map(
+            x => zi[x][$.inputMethod].split(" ")  // multiple wubi/cangjie can map to one character
+          )
+        );
+      } else {
+        result.spelling = simplified.split("").map(
+          (_, i) => ci[simplified].map(
+            x => x[$.inputMethod].split(" ")[i].slice(0, -1)  // remove tone number at end
+          )
+        );
+      }
+      return result;
+    })
+  );
 }
 
 function* iterrows(table) {
@@ -62,29 +96,24 @@ function* iterrows(table) {
   }
 }
 
-const chars = iterrows(zi).reduce((acc, row) => {
+const zi = iterrows(ziData).reduce((acc, row) => {
   acc[row["hanzi"]] = row;
   return acc;
 }, {});
 
-const words = iterrows(ci).reduce((acc, row) => {
+const ci = iterrows(ciData).reduce((acc, row) => {
   // use simplified as key because that is the format of HSK
-  acc[row["simplified"]] = row
+  if (!(row["simplified"] in acc)) {
+    acc[row["simplified"]] = [];
+  }
+  acc[row["simplified"]].push(row);
   return acc;
 }, {});
 
-const levels = iterrows(hsk).reduce((acc, row) => {
+const hsk = iterrows(hskData).reduce((acc, row) => {
   if (!(row["level"] in acc)) {
     acc[row["level"]] = [];
   }
   acc[row["level"]].push(row["simplified"]);
   return acc;
 }, {});
-
-export function randomWords(level, numWords=10) {
-  return Array(numWords).fill(undefined).map(_ => {
-    const options = levels[level];
-    const simplified = options[Math.floor(options.length * Math.random())];
-    return words[simplified];
-  });
-}

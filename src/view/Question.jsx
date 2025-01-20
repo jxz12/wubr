@@ -1,36 +1,36 @@
-export default function Question({ question, answer, characterSet, inputMethod }) {
+export default function Question({ question }) {
   return (
     <div className="question">
-      {question.map((word, i) => (
-        <Word
-          key={i}
-          characters={word[characterSet]}
-          spelling={word[inputMethod]}
-          meanings={word.meanings}
-        />
-      ))}
+      {question.map((ci, i) => <Ci key={i} ci={ci} />)}
     </div>
   );
 }
 
-function Word({ characters, spelling, meanings }) {
-  const charArray = characters.split("");
-  const spellArray = spelling.split(" ");
-  if (charArray.length !== spellArray.length) {
+function Ci({ ci }) {
+  // TODO: on hover show meaning(s)
+  console.log(ci);
+
+  const characters = ci.simplified.split("");
+  // TODO: handle multiple pronounciations or jyutping
+  const pinyins = ci.definitions[0].pinyin.split(" ");
+  if (characters.length !== pinyins.length) {
     throw Error("length of characters does not equal length of spelling");
   }
-  // TODO: on hover show meaning(s)
-  console.log(characters, meanings);
   return (
     <span className="ci">
-      {charArray.map((_, i) => (
-        <span key={i} className="zi">
-          <div className="spelling">{accentPinyin(spellArray[i])}</div>
-          <div className="character">{charArray[i]}</div>
-        </span>
-      ))}
+      {characters.map((_, i) => <Zi key={i} character={characters[i]} pinyin={accentPinyin(pinyins[i])} />)}
     </span>
   );
+}
+
+function Zi({ character, pinyin, jyutping }) {
+  // TODO: show jyutping
+  return (
+    <span className="zi">
+      <div className="pinyin">{pinyin}</div>
+      <div className="character">{character}</div>
+    </span>
+  )
 }
 
 function accentPinyin(pinyin) {

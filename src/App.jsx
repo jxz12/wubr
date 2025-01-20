@@ -12,7 +12,7 @@ export default function App() {
   return (
     <>
       <NavBar hskLevel={hskLevel} characterSet={characterSet} inputMethod={inputMethod} />
-      <Question question={question} answer={answer} characterSet={characterSet} inputMethod={inputMethod} />
+      <Question question={question} />
       <Keyboard inputMethod={inputMethod} answer={answer} />
     </>
   )
