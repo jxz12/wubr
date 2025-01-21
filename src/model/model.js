@@ -69,10 +69,9 @@ function deriveQuestionFromCi() {
       result.definitions = ci[simplified];
 
       if (["wubi", "cangjie"].includes($.inputMethod)) {
-        // TODO: handle when characterSet is traditional?
-        result.spelling = simplified.map(
-          x => x.split("").map(
-            x => zi[x][$.inputMethod].split(" ")  // multiple wubi/cangjie can map to one character
+        result.spelling = simplified.split("").map(
+          (_, i) => ci[simplified].map(
+            x => zi[x[$.characterSet][i]][$.inputMethod]
           )
         );
       } else {
