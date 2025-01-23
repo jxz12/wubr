@@ -13,10 +13,13 @@ export function select(event) {
   switch (event.target.name) {
     case "hskLevel":
       setHskLevel(event.target.value);
+      break;
     case "characterSet":
       setCharacterSet(event.target.value);
+      break;
     case "inputMethod":
       setInputMethod(event.target.value);
+      break;
   }
 }
 

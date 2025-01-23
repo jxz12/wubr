@@ -129,8 +129,7 @@ function accentJyutping(jyutping) {
 }
 
 function accentJyutpingSingle(jyutping) {
-  // TODO: show better accents than numbers
-  // but the instagram curves are a bit better
+  // TODO: this sort of rendering would be nicer https://visual-fonts.com/2024/04/make-jyutping-look-good/
   const tone = Number(jyutping[jyutping.length - 1]);
   const contour = ["˥", "˧˥", "˧", "˨˩", "˩˧", "˨"][tone - 1];
   return `${jyutping.substring(0, jyutping.length-1)}${contour}`;
