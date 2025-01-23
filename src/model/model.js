@@ -63,27 +63,67 @@ function randomiseCi(numWords=10) {
   deriveQuestionFromCi();
 }
 function deriveQuestionFromCi() {
+  console.log(hsk);
+  console.log(ciQuestion);
   $.setQuestion(
-    ciQuestion[ciQuestion.length - 1].map(simplified => {
-      const result = { simplified };
-      result.definitions = ci[simplified];
+    ciQuestion[ciQuestion.length - 1].map(({simplified, traditional, pinyin}) => {
+      console.log([simplified, traditional, pinyin]);
+      const ciSingle = ci[simplified][traditional][pinyin];
+      const result = {
+        characters: ciSingle[$.characterSet],
+        meanings: ciSingle.meanings,
+      };
 
       if (["wubi", "cangjie"].includes($.inputMethod)) {
-        result.spelling = simplified.split("").map(
-          (_, i) => ci[simplified].map(
-            x => zi[x[$.characterSet][i]][$.inputMethod]
-          )
+        result.pronounciation = pinyin;
+        result.spelling = result.characters.split("").map(
+          x => zi[x].split(" ")
+        );
+      } else if ($.inputMethod === "pinyin") {
+        result.pronounciation = accentPinyin(pinyin);
+        result.spelling = pinyin.split(" ").map(
+          x => [x.slice(0, -1)]
         );
       } else {
-        result.spelling = simplified.split("").map(
-          (_, i) => ci[simplified].map(
-            x => x[$.inputMethod].split(" ")[i].slice(0, -1)  // remove tone number at end
-          )
+        // TODO: show better accents than numbers
+        // maybe these: ˥ ˧˥ ˧ ˨˩ ˩˧ ˨
+        // but the instagram curves are a bit better
+        result.pronounciation = ciSingle.jyutping;
+        result.spelling = ciSingle.jyutping.split(" ").map(
+          x => [x.slice(0, -1)]
         );
       }
       return result;
     })
   );
+}
+
+function accentPinyin(pinyin) {
+  const tone = Number(pinyin[pinyin.length - 1]);
+  const vowelStartIdx = pinyin.split("").findIndex(x => "aeiouv".includes(x));
+  const vowelEndIdx = pinyin.split("").findLastIndex(x => "aeiouv".includes(x));
+
+  const vowelAccentIdx = "iuv".includes(pinyin[vowelStartIdx])
+    ? Math.min(vowelStartIdx + 1, vowelEndIdx)
+    : vowelStartIdx;
+  const vowelAccent = pinyin[vowelAccentIdx];
+
+  const correctedAccent = {
+    a: ["ā", "á", "ǎ", "à", "a"],
+    A: ["Ā", "Á", "Ǎ", "À", "A"],
+    e: ["ē", "é", "ě", "è", "e"],
+    E: ["Ē", "É", "Ě", "È", "E"],
+    i: ["ī", "í", "ǐ", "ì", "i"],
+    I: ["Ī", "Í", "Ǐ", "Ì", "I"],
+    o: ["ō", "ó", "ǒ", "ò", "o"],
+    O: ["Ō", "Ó", "Ǒ", "Ò", "o"],
+    u: ["ū", "ú", "ǔ", "ù", "u"],
+    U: ["Ū", "Ú", "Ǔ", "Ù", "u"],
+    v: ["ǖ", "ǘ", "ǚ", "ǜ", "ü"],
+    V: ["Ǖ", "Ǘ", "Ǚ", "Ǜ", "Ü"],
+  }[vowelAccent][tone - 1]
+
+  return `${pinyin.substring(0, vowelStartIdx)}${pinyin.substring(vowelStartIdx, vowelAccentIdx)}${correctedAccent}${pinyin.substring(vowelAccentIdx+1, pinyin.length-1)}`;
 }
 
 function* iterrows(table) {
@@ -103,9 +143,12 @@ const zi = iterrows(ziData).reduce((acc, row) => {
 const ci = iterrows(ciData).reduce((acc, row) => {
   // use simplified as key because that is the format of HSK
   if (!(row["simplified"] in acc)) {
-    acc[row["simplified"]] = [];
+    acc[row["simplified"]] = {};
   }
-  acc[row["simplified"]].push(row);
+  if (!(row["traditional"] in acc[row["simplified"]])) {
+    acc[row["simplified"]][row["traditional"]] = {};
+  }
+  acc[row["simplified"]][row["traditional"]][row["pinyin"]] = row;
   return acc;
 }, {});
 
@@ -113,6 +156,6 @@ const hsk = iterrows(hskData).reduce((acc, row) => {
   if (!(row["level"] in acc)) {
     acc[row["level"]] = [];
   }
-  acc[row["level"]].push(row["simplified"]);
+  acc[row["level"]].push(row);
   return acc;
 }, {});
