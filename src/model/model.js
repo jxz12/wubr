@@ -63,11 +63,8 @@ function randomiseCi(numWords=10) {
   deriveQuestionFromCi();
 }
 function deriveQuestionFromCi() {
-  console.log(hsk);
-  console.log(ciQuestion);
   $.setQuestion(
     ciQuestion[ciQuestion.length - 1].map(({simplified, traditional, pinyin}) => {
-      console.log([simplified, traditional, pinyin]);
       const ciSingle = ci[simplified][traditional][pinyin];
       const result = {
         characters: ciSingle[$.characterSet],
@@ -75,9 +72,9 @@ function deriveQuestionFromCi() {
       };
 
       if (["wubi", "cangjie"].includes($.inputMethod)) {
-        result.pronounciation = pinyin;
+        result.pronounciation = accentPinyin(pinyin);
         result.spelling = result.characters.split("").map(
-          x => zi[x].split(" ")
+          x => { return zi[x][$.inputMethod].split(" ")}
         );
       } else if ($.inputMethod === "pinyin") {
         result.pronounciation = accentPinyin(pinyin);
@@ -85,10 +82,7 @@ function deriveQuestionFromCi() {
           x => [x.slice(0, -1)]
         );
       } else {
-        // TODO: show better accents than numbers
-        // maybe these: ˥ ˧˥ ˧ ˨˩ ˩˧ ˨
-        // but the instagram curves are a bit better
-        result.pronounciation = ciSingle.jyutping;
+        result.pronounciation = accentJyutping(ciSingle.jyutping);
         result.spelling = ciSingle.jyutping.split(" ").map(
           x => [x.slice(0, -1)]
         );
@@ -99,9 +93,13 @@ function deriveQuestionFromCi() {
 }
 
 function accentPinyin(pinyin) {
+  return pinyin.split(" ").map(accentPinyinSingle).join(" ");
+}
+
+function accentPinyinSingle(pinyin) {
   const tone = Number(pinyin[pinyin.length - 1]);
-  const vowelStartIdx = pinyin.split("").findIndex(x => "aeiouv".includes(x));
-  const vowelEndIdx = pinyin.split("").findLastIndex(x => "aeiouv".includes(x));
+  const vowelStartIdx = pinyin.split("").findIndex(x => "aAeEiIoOuUvV".includes(x));
+  const vowelEndIdx = pinyin.split("").findLastIndex(x => "aAeEiIoOuUvV".includes(x));
 
   const vowelAccentIdx = "iuv".includes(pinyin[vowelStartIdx])
     ? Math.min(vowelStartIdx + 1, vowelEndIdx)
@@ -124,6 +122,18 @@ function accentPinyin(pinyin) {
   }[vowelAccent][tone - 1]
 
   return `${pinyin.substring(0, vowelStartIdx)}${pinyin.substring(vowelStartIdx, vowelAccentIdx)}${correctedAccent}${pinyin.substring(vowelAccentIdx+1, pinyin.length-1)}`;
+}
+
+function accentJyutping(jyutping) {
+  return jyutping.split(" ").map(accentJyutpingSingle).join(" ");
+}
+
+function accentJyutpingSingle(jyutping) {
+  // TODO: show better accents than numbers
+  // but the instagram curves are a bit better
+  const tone = Number(jyutping[jyutping.length - 1]);
+  const contour = ["˥", "˧˥", "˧", "˨˩", "˩˧", "˨"][tone - 1];
+  return `${jyutping.substring(0, jyutping.length-1)}${contour}`;
 }
 
 function* iterrows(table) {

@@ -11,7 +11,7 @@ function Ci({ ci }) {
   console.log(ci);
 
   const characters = ci.characters.split("");
-  const pronounciations = ci.pronounciation[0].pinyin.split(" ");
+  const pronounciations = ci.pronounciation.split(" ");
   if (characters.length !== pronounciations.length) {
     throw Error("length of characters does not equal length of spelling");
   }
