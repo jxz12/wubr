@@ -1,8 +1,6 @@
 import {useState, useEffect} from 'react'
 
-import ziData from '../data/zi.json'
-import ciData from '../data/ci.json'
-import hskData from '../data/hsk.json'
+import {zi, ci, hsk} from '../data/data'
 
 
 // react state to be stored in here
@@ -17,20 +15,22 @@ export function init() {
   const [characterSet, setCharacterSet] = useState("simplified");
   const [inputMethod, setInputMethod] = useState("pinyin");
   const [question, setQuestion] = useState([]);
-  const [answer, setAnswer] = useState([]);
+  const [correct, setCorrect] = useState([]);
+  const [incorrect, setIncorrect] = useState([]);
   useEffect(() => {
     // this is a lot of boilerplate but allows us to keep track of state automatically
     $ = {
-      hskLevel, characterSet, inputMethod, question, answer,
+      hskLevel, characterSet, inputMethod, question, correct, incorrect,
       setHskLevel: x => { $.hskLevel = x; setHskLevel(x); },
       setCharacterSet: x => { $.characterSet = x; setCharacterSet(x); },
       setInputMethod: x => { $.inputMethod = x; setInputMethod(x); },
       setQuestion: x => { $.question = x; setQuestion(x); },
-      setAnswer: x => { $.answer = x; setAnswer(x); },
+      setCorrect: x => { $.correct = x; setCorrect(x); },
+      setIncorrect: x => { $.incorrect = x; setIncorrect(x); },
     }
     randomiseCi();
   }, []);
-  return {hskLevel, characterSet, inputMethod, question, answer};
+  return {hskLevel, characterSet, inputMethod, question, correct, incorrect};
 }
 
 export function setHskLevel(level) {
@@ -49,19 +49,16 @@ export function setInputMethod(inputMethod) {
   // TODO: need to reset answer
 }
 
-export function pushKeystroke(timestamp, keycode) {
-  keystrokes.push([timestamp, keycode]);
-  // TODO: calculate if answer matches input
-}
-
 function randomiseCi(numWords=10) {
   const randomised = Array(numWords).fill(undefined).map(_ => {
     const options = hsk[$.hskLevel];
     return options[Math.floor(options.length * Math.random())];
   });
   ciQuestion.push(randomised);
+  keystrokes.push([]);
   deriveQuestionFromCi();
 }
+
 function deriveQuestionFromCi() {
   $.setQuestion(
     ciQuestion[ciQuestion.length - 1].map(({simplified, traditional, pinyin}) => {
@@ -135,36 +132,54 @@ function accentJyutpingSingle(jyutping) {
   return `${jyutping.substring(0, jyutping.length-1)}${contour}`;
 }
 
-function* iterrows(table) {
-  const keys = Object.keys(table);
-  for (let i=0; i<table[keys[0]].length; i++) {
-    yield keys.reduce((acc, key) => { acc[key] = table[key][i];
-      return acc;
-    }, {});
-  }
+export function pushKeystroke(keycode, timestamp) {
+  const currentKeystrokes = keystrokes[keystrokes.length - 1]
+  currentKeystrokes.push({keycode, timestamp});
+  const { correct, incorrect } = markAnswer(
+    $.question.map(ci => ci.spelling),
+    currentKeystrokes.map(ks => ks.keycode),
+  );
+  $.setCorrect(correct);
+  $.setIncorrect(incorrect);
 }
 
-const zi = iterrows(ziData).reduce((acc, row) => {
-  acc[row["hanzi"]] = row;
-  return acc;
-}, {});
+export function markAnswer(spellings, keycodes) {
+  const letters = keycodes.reduce((agg, keycode) => {
+    if (keycode === "Backspace") {
+      agg.pop();
+    } else if (keycode.startsWith("Key")) {
+      agg.push(keycode[3].toLowerCase());
+    } else if (keycode === "Space") {
+      agg.push(" ");
+    }
+    return agg;
+  }, [])
 
-const ci = iterrows(ciData).reduce((acc, row) => {
-  // use simplified as key because that is the format of HSK
-  if (!(row["simplified"] in acc)) {
-    acc[row["simplified"]] = {};
+  const correct = [];
+  const incorrect = [];
+  let ciIndex = 0;
+  let ziIndex = 0;
+  for (const letter of letters) {
+    if (incorrect.length > 0) {
+      incorrect.push(letter);
+      continue;
+    }
+    if (ziIndex > spellings[ciIndex].length) {
+      if (letter === " ") {
+        correct.push(letter);
+        ciIndex += 1;
+        ziIndex = 0;
+      } else {
+        incorrect.push(letter);
+      }
+      continue;
+    }
+    if (spellings[ciIndex][ziIndex].includes(letter)) {
+      correct.push(letter);
+      ziIndex += 1;
+      continue;
+    }
+    incorrect.push(letter);
   }
-  if (!(row["traditional"] in acc[row["simplified"]])) {
-    acc[row["simplified"]][row["traditional"]] = {};
-  }
-  acc[row["simplified"]][row["traditional"]][row["pinyin"]] = row;
-  return acc;
-}, {});
-
-const hsk = iterrows(hskData).reduce((acc, row) => {
-  if (!(row["level"] in acc)) {
-    acc[row["level"]] = [];
-  }
-  acc[row["level"]].push(row);
-  return acc;
-}, {});
+  return {correct, incorrect};
+}

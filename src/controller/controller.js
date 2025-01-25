@@ -25,5 +25,5 @@ export function select(event) {
 
 document.addEventListener('keydown', onKeyDown, true);
 function onKeyDown(event) {
-  pushKeystroke(event.timeStamp, event.code);
+  pushKeystroke(event.code, event.timeStamp);
 }
