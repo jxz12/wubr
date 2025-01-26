@@ -8,7 +8,7 @@ export default function Question({ question }) {
 
 function Ci({ ci }) {
   // TODO: on hover show meaning(s)
-  // console.log(ci);
+  console.log(ci);
 
   const characters = ci.characters.split("");
   const pronounciations = ci.pronounciation.split(" ");
