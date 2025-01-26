@@ -76,12 +76,12 @@ function deriveQuestionFromCi() {
       } else if ($.inputMethod === "pinyin") {
         result.pronounciation = accentPinyin(pinyin);
         result.spelling = pinyin.split(" ").map(
-          x => [x.slice(0, -1)]
+          x => [x.slice(0, -1).toLowerCase()]  // lower case to handle names
         );
       } else {
         result.pronounciation = accentJyutping(ciSingle.jyutping);
         result.spelling = ciSingle.jyutping.split(" ").map(
-          x => [x.slice(0, -1)]
+          x => [x.slice(0, -1).toLowerCase()]  // lower case to handle names
         );
       }
       return result;
@@ -158,28 +158,48 @@ export function markAnswer(spellings, keycodes) {
   const correct = [];
   const incorrect = [];
   let ciIndex = 0;
-  let ziIndex = 0;
+  let spelling = allSpellings(spellings[0]);
+  let spellIndex = 0;
   for (const letter of letters) {
     if (incorrect.length > 0) {
       incorrect.push(letter);
       continue;
     }
-    if (ziIndex > spellings[ciIndex].length) {
+    if (spelling.map(x => x[spellIndex]).includes(letter)) {
+      correct.push(letter);
+      spellIndex += 1;
+      continue;
+    }
+    const currentAnswer = correct.slice(
+      correct.findLastIndex(x => x === " ") + 1
+    ).join("");
+    if (spelling.includes(currentAnswer)) {
       if (letter === " ") {
         correct.push(letter);
         ciIndex += 1;
-        ziIndex = 0;
+        spelling = allSpellings(spellings[ciIndex]);
+        spellIndex = 0;
       } else {
         incorrect.push(letter);
       }
       continue;
     }
-    if (spellings[ciIndex][ziIndex].includes(letter)) {
-      correct.push(letter);
-      ziIndex += 1;
-      continue;
-    }
     incorrect.push(letter);
   }
   return {correct, incorrect};
+}
+
+function allSpellings(ci) {
+  // BFS to get all combinations of spellings
+  let queue = ci[0];
+  for (let i=1; i<ci.length; i++) {
+    let queueNext = [];
+    for (const prevSpelling of queue) {
+      for (const spelling of ci[i]) {
+        queueNext.push(`${prevSpelling}${spelling}`);
+      }
+    }
+    queue = queueNext;
+  }
+  return queue;
 }

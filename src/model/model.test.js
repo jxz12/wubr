@@ -1,8 +1,8 @@
 import { expect, test } from 'vitest'
 import { markAnswer } from './model.js'
 
-test('test correct answer', () => {
-  const spellings = [[["f"], ["o"], ["o"]], [["b"], ["a"], ["r", "z"]]]
+test('test mark answer', () => {
+  const spellings = [[["foo"], ["bar", "baz"]], [["caz"]]];
   expect(
     markAnswer(
       spellings,
@@ -12,6 +12,18 @@ test('test correct answer', () => {
     {
       correct: ["f"],
       incorrect: ["a"],
+    }
+  )
+
+  expect(
+    markAnswer(
+      spellings,
+      ["KeyF", "KeyA", "Backspace", "KeyO", "KeyO", "KeyB", "KeyA", "KeyZ", "Space", "KeyX"],
+    )
+  ).toStrictEqual(
+    {
+      correct: "foobaz ".split(""),
+      incorrect: ["x"],
     }
   )
 })

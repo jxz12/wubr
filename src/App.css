@@ -23,3 +23,9 @@
 .character {
   font-size: 2em;
 }
+.answer-correct {
+  color: chartreuse;
+}
+.answer-incorrect {
+  color: red;
+}
