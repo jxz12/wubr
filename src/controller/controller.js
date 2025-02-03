@@ -1,13 +1,31 @@
+import {useState, useEffect} from 'react'
+
 import {
+  initModel,
+  randomiseCi,
   setHskLevel,
   setCharacterSet,
   setInputMethod,
-  pushKeystroke
+  pushKeystroke,
 } from '../model/model'
 
 
-// NOTE to self: the controller needs to be stateless
-//   this will therefore be quite a thin layer just to convert between HTML events and our model
+// NOTE to self: the controller should be stateless
+//   and the purpose is to be a thin layer to abstract React and HTML away from the model
+
+export function initController() {
+  const [hskLevel, setHskLevel] = useState(undefined);
+  const [characterSet, setCharacterSet] = useState(undefined);
+  const [inputMethod, setInputMethod] = useState(undefined);
+  const [question, setQuestion] = useState(undefined);
+  const [correct, setCorrect] = useState(undefined);
+  const [incorrect, setIncorrect] = useState(undefined);
+  useEffect(() => {
+    // you could imagine this init function taking time
+    initModel(setHskLevel, setCharacterSet, setInputMethod, setQuestion, setCorrect, setIncorrect);
+  }, []);
+  return {hskLevel, characterSet, inputMethod, question, correct, incorrect};
+}
 
 export function select(event) {
   switch (event.target.name) {

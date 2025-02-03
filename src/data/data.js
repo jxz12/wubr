@@ -24,6 +24,7 @@ export const zi = iterreduce(ziData, (acc, row) => {
 
 export const ci = iterreduce(ciData, (acc, row) => {
   // 3-tuple of simplified+traditional+pinyin is a unique primary key
+  // TODO: this might be better if transformed into a single string key
   if (!(row["simplified"] in acc)) {
     acc[row["simplified"]] = {};
   }

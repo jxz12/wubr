@@ -1,36 +1,36 @@
-import {useState, useEffect} from 'react'
-
 import {zi, ci, hsk} from '../data/data'
 
-
-// react state to be stored in here
+// all state and callbacks to be stored in here
 let $ = undefined;
 
-// these will store a time series of all user inputs to derive the state
-const keystrokes = [];
-const ciQuestion = [];
-
-export function init() {
-  const [hskLevel, setHskLevel] = useState(1);
-  const [characterSet, setCharacterSet] = useState("simplified");
-  const [inputMethod, setInputMethod] = useState("pinyin");
-  const [question, setQuestion] = useState([]);
-  const [correct, setCorrect] = useState([]);
-  const [incorrect, setIncorrect] = useState([]);
-  useEffect(() => {
-    // this is a lot of boilerplate but allows us to keep track of state automatically
-    $ = {
-      hskLevel, characterSet, inputMethod, question, correct, incorrect,
-      setHskLevel: x => { $.hskLevel = x; setHskLevel(x); },
-      setCharacterSet: x => { $.characterSet = x; setCharacterSet(x); },
-      setInputMethod: x => { $.inputMethod = x; setInputMethod(x); },
-      setQuestion: x => { $.question = x; setQuestion(x); },
-      setCorrect: x => { $.correct = x; setCorrect(x); },
-      setIncorrect: x => { $.incorrect = x; setIncorrect(x); },
-    }
-    randomiseCi();
-  }, []);
-  return {hskLevel, characterSet, inputMethod, question, correct, incorrect};
+// all of these parameters are callbacks the model will use to push state to the view
+// this should technically be agnostic of whether the view is React or anything else
+export function initModel(setHskLevel, setCharacterSet, setInputMethod, setQuestion, setCorrect, setIncorrect) {
+  if ($ !== undefined) {
+    // throw Error("model already initialised");
+    console.log("Cannot assert because of React safe mode");
+    return;
+  }
+  // this is a lot of boilerplate but allows us to keep track of state automatically
+  $ = {
+    // these will store a time series of all user inputs to derive the state
+    keystrokes: [],
+    ciQuestion: [],
+    setHskLevel: x => { $.hskLevel = x; setHskLevel(x); },
+    setCharacterSet: x => { $.characterSet = x; setCharacterSet(x); },
+    setInputMethod: x => { $.inputMethod = x; setInputMethod(x); },
+    setQuestion: x => { $.question = x; setQuestion(x); },
+    setCorrect: x => { $.correct = x; setCorrect(x); },
+    setIncorrect: x => { $.incorrect = x; setIncorrect(x); },
+  }
+  // TODO: in the future take these settings from localStorage
+  $.setHskLevel(1);
+  $.setCharacterSet("simplified");
+  $.setInputMethod("pinyin");
+  $.setQuestion([]);
+  $.setCorrect([]);
+  $.setIncorrect([]);
+  randomiseCi();
 }
 
 export function setHskLevel(level) {
@@ -49,19 +49,19 @@ export function setInputMethod(inputMethod) {
   // TODO: need to reset answer
 }
 
-function randomiseCi(numWords=10) {
+export function randomiseCi(numWords=10) {
   const randomised = Array(numWords).fill(undefined).map(_ => {
     const options = hsk[$.hskLevel];
     return options[Math.floor(options.length * Math.random())];
   });
-  ciQuestion.push(randomised);
-  keystrokes.push([]);
+  $.ciQuestion.push(randomised);
+  $.keystrokes.push([]);
   deriveQuestionFromCi();
 }
 
 function deriveQuestionFromCi() {
   $.setQuestion(
-    ciQuestion[ciQuestion.length - 1].map(({simplified, traditional, pinyin}) => {
+    $.ciQuestion[$.ciQuestion.length - 1].map(({simplified, traditional, pinyin}) => {
       const ciSingle = ci[simplified][traditional][pinyin];
       const result = {
         characters: ciSingle[$.characterSet],
@@ -133,7 +133,7 @@ function accentJyutpingSingle(jyutping) {
 }
 
 export function pushKeystroke(keycode, timestamp) {
-  const currentKeystrokes = keystrokes[keystrokes.length - 1]
+  const currentKeystrokes = $.keystrokes[$.keystrokes.length - 1]
   currentKeystrokes.push({keycode, timestamp});
   const { correct, incorrect } = markAnswer(
     $.question.map(ci => ci.spelling),
@@ -141,6 +141,10 @@ export function pushKeystroke(keycode, timestamp) {
   );
   $.setCorrect(correct);
   $.setIncorrect(incorrect);
+  // TODO: how to detect if a game is over?
+  //   when it is over we need to record the user's score and learning progress
+  //   we should continue keeping track of incorrect keystrokes too (show correct answer on incorrect input)
+  //   also need to think about when to show the meanings, maybe we should simply always show it?
 }
 
 export function markAnswer(spellings, keycodes) {
