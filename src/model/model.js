@@ -49,7 +49,7 @@ export function setInputMethod(inputMethod) {
   // TODO: need to reset answer
 }
 
-export function randomiseCi(numWords=10) {
+function randomiseCi(numWords=10) {
   const randomised = Array(numWords).fill(undefined).map(_ => {
     const options = hsk[$.hskLevel];
     return options[Math.floor(options.length * Math.random())];

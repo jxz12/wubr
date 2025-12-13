@@ -2,7 +2,6 @@ import {useState, useEffect} from 'react'
 
 import {
   initModel,
-  randomiseCi,
   setHskLevel,
   setCharacterSet,
   setInputMethod,

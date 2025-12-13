@@ -57,11 +57,11 @@ word table (词)
   * for piano make the top two rows of the keyboard the white keys, and then the number for can be black keys
   * and this works pretty well because the A key can actually be A, and Enter is E which is satisfying
 
-  1   2       4   5       7   8   9       -   = 
+  1   2       4   5       7   8   9       -   =
 Tab Q   W   E   R   T   Y   U   I   O   P   [   ]   \
  Esc A   S   D   F   G   H   J   K   L   ;   '   Entr
 
-  G#  A#      C#  D#      F#  G#  A#      C#  D# 
+  G#  A#      C#  D#      F#  G#  A#      C#  D#
 G   A   B   C   D   E   F   G   A   B   C   D   E   F
  G   A   B   C   D   E   F   G   A   B   C   D   E   F
 
